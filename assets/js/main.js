@@ -1,22 +1,25 @@
 /*
-	Phantom by HTML5 UP
+	Read Only by HTML5 UP
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
 
 (function($) {
 
-	var	$window = $(window),
-		$body = $('body');
+	var $window = $(window),
+		$body = $('body'),
+		$header = $('#header'),
+		$titleBar = null,
+		$nav = $('#nav'),
+		$wrapper = $('#wrapper');
 
 	// Breakpoints.
 		breakpoints({
 			xlarge:   [ '1281px',  '1680px' ],
-			large:    [ '981px',   '1280px' ],
-			medium:   [ '737px',   '980px'  ],
+			large:    [ '1025px',  '1280px' ],
+			medium:   [ '737px',   '1024px' ],
 			small:    [ '481px',   '736px'  ],
-			xsmall:   [ '361px',   '480px'  ],
-			xxsmall:  [ null,      '360px'  ]
+			xsmall:   [ null,      '480px'  ],
 		});
 
 	// Play initial animations on page load.
@@ -26,160 +29,131 @@
 			}, 100);
 		});
 
-	// Touch?
-		if (browser.mobile)
-			$body.addClass('is-touch');
+	// Tweaks/fixes.
 
-	// Forms.
-		var $form = $('form');
+		// Polyfill: Object fit.
+			if (!browser.canUse('object-fit')) {
 
-		// Auto-resizing textareas.
-			$form.find('textarea').each(function() {
+				$('.image[data-position]').each(function() {
 
-				var $this = $(this),
-					$wrapper = $('<div class="textarea-wrapper"></div>'),
-					$submits = $this.find('input[type="submit"]');
+					var $this = $(this),
+						$img = $this.children('img');
 
-				$this
-					.wrap($wrapper)
-					.attr('rows', 1)
-					.css('overflow', 'hidden')
-					.css('resize', 'none')
-					.on('keydown', function(event) {
-
-						if (event.keyCode == 13
-						&&	event.ctrlKey) {
-
-							event.preventDefault();
-							event.stopPropagation();
-
-							$(this).blur();
-
-						}
-
-					})
-					.on('blur focus', function() {
-						$this.val($.trim($this.val()));
-					})
-					.on('input blur focus --init', function() {
-
-						$wrapper
-							.css('height', $this.height());
-
+					// Apply img as background.
 						$this
-							.css('height', 'auto')
-							.css('height', $this.prop('scrollHeight') + 'px');
+							.css('background-image', 'url("' + $img.attr('src') + '")')
+							.css('background-position', $this.data('position'))
+							.css('background-size', 'cover')
+							.css('background-repeat', 'no-repeat');
 
-					})
-					.on('keyup', function(event) {
+					// Hide img.
+						$img
+							.css('opacity', '0');
 
-						if (event.keyCode == 9)
-							$this
-								.select();
+				});
 
-					})
-					.triggerHandler('--init');
+			}
 
-				// Fix.
-					if (browser.name == 'ie'
-					||	browser.mobile)
+	// Header Panel.
+
+		// Nav.
+			var $nav_a = $nav.find('a');
+
+			$nav_a
+				.addClass('scrolly')
+				.on('click', function() {
+
+					var $this = $(this);
+
+					// External link? Bail.
+						if ($this.attr('href').charAt(0) != '#')
+							return;
+
+					// Deactivate all links.
+						$nav_a.removeClass('active');
+
+					// Activate link *and* lock it (so Scrollex doesn't try to activate other links as we're scrolling to this one's section).
 						$this
-							.css('max-height', '10em')
-							.css('overflow-y', 'auto');
+							.addClass('active')
+							.addClass('active-locked');
 
-			});
+				})
+				.each(function() {
 
-	// Menu.
-		var $menu = $('#menu');
+					var	$this = $(this),
+						id = $this.attr('href'),
+						$section = $(id);
 
-		$menu.wrapInner('<div class="inner"></div>');
+					// No section for this link? Bail.
+						if ($section.length < 1)
+							return;
 
-		$menu._locked = false;
+					// Scrollex.
+						$section.scrollex({
+							mode: 'middle',
+							top: '5vh',
+							bottom: '5vh',
+							initialize: function() {
 
-		$menu._lock = function() {
+								// Deactivate section.
+									$section.addClass('inactive');
 
-			if ($menu._locked)
-				return false;
+							},
+							enter: function() {
 
-			$menu._locked = true;
+								// Activate section.
+									$section.removeClass('inactive');
 
-			window.setTimeout(function() {
-				$menu._locked = false;
-			}, 350);
+								// No locked links? Deactivate all links and activate this section's one.
+									if ($nav_a.filter('.active-locked').length == 0) {
 
-			return true;
+										$nav_a.removeClass('active');
+										$this.addClass('active');
 
-		};
+									}
 
-		$menu._show = function() {
+								// Otherwise, if this section's link is the one that's locked, unlock it.
+									else if ($this.hasClass('active-locked'))
+										$this.removeClass('active-locked');
 
-			if ($menu._lock())
-				$body.addClass('is-menu-visible');
+							}
+						});
 
-		};
+				});
 
-		$menu._hide = function() {
+		// Title Bar.
+			$titleBar = $(
+				'<div id="titleBar">' +
+					'<a href="#header" class="toggle"></a>' +
+					'<span class="title">' + $('#logo').html() + '</span>' +
+				'</div>'
+			)
+				.appendTo($body);
 
-			if ($menu._lock())
-				$body.removeClass('is-menu-visible');
+		// Panel.
+			$header
+				.panel({
+					delay: 500,
+					hideOnClick: true,
+					hideOnSwipe: true,
+					resetScroll: true,
+					resetForms: true,
+					side: 'right',
+					target: $body,
+					visibleClass: 'header-visible'
+				});
 
-		};
+	// Scrolly.
+		$('.scrolly').scrolly({
+			speed: 1000,
+			offset: function() {
 
-		$menu._toggle = function() {
+				if (breakpoints.active('<=medium'))
+					return $titleBar.height();
 
-			if ($menu._lock())
-				$body.toggleClass('is-menu-visible');
+				return 0;
 
-		};
-
-		$menu
-			.appendTo($body)
-			.on('click', function(event) {
-				event.stopPropagation();
-			})
-			.on('click', 'a', function(event) {
-
-				var href = $(this).attr('href');
-
-				event.preventDefault();
-				event.stopPropagation();
-
-				// Hide.
-					$menu._hide();
-
-				// Redirect.
-					if (href == '#menu')
-						return;
-
-					window.setTimeout(function() {
-						window.location.href = href;
-					}, 350);
-
-			})
-			.append('<a class="close" href="#menu">Close</a>');
-
-		$body
-			.on('click', 'a[href="#menu"]', function(event) {
-
-				event.stopPropagation();
-				event.preventDefault();
-
-				// Toggle.
-					$menu._toggle();
-
-			})
-			.on('click', function(event) {
-
-				// Hide.
-					$menu._hide();
-
-			})
-			.on('keydown', function(event) {
-
-				// Hide on escape.
-					if (event.keyCode == 27)
-						$menu._hide();
-
-			});
+			}
+		});
 
 })(jQuery);

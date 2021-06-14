@@ -1,50 +1,64 @@
 // Misc.
 	$misc: (
-		z-index-base:		10000
+		z-index-base:		10000,
+		header-side:		'right'
 	);
 
 // Duration.
 	$duration: (
-		menu:				0.45s,
+		header:				0.5s,
 		transition:			0.2s
 	);
 
 // Size.
 	$size: (
-		border-radius:		4px,
-		border-width:		1px,
-		element-height:		3em,
-		element-margin:		2em,
-		gutter:				2.5em,
-		field-gutter:		2em,
-		inner:				68em,
-		menu:				22em
+		border-radius:		5px,
+		border-width:		2px,
+		element-height:		2.75em,
+		element-margin:		2.25em,
+		container-width:	45em
 	);
 
 // Font.
 	$font: (
-		family:				('Source Sans Pro', Helvetica, sans-serif),
-		family-fixed:		('Courier New', monospace),
-		weight:				300,
-		weight-bold:		900,
-		weight-bold-alt:	700,
-		letter-spacing:		0.35em,
-		letter-spacing-alt:	-0.035em
+		family:				('Lato', sans-serif),
+		family-fixed:		('Source Code Pro', monospace),
+		weight:				400,
+		weight-bold:		700
 	);
 
 // Palette.
 	$palette: (
-		bg:					#ffffff,
-		bg-accent:			#333333,
-		bg-alt:				#f6f6f6,
-		fg:					#585858,
-		fg-accent:			#ffffff,
-		border:				#c9c9c9,
-		border-bg:			rgba(144,144,144,0.075),
-		accent1:			#f2849e,
-		accent2:			#7ecaf6,
-		accent3:			#7bd0c1,
-		accent4:			#c75b9b,
-		accent5:			#ae85ca,
-		accent6:			#8499e7,
+		bg:					#fff,
+		fg:					#888,
+		fg-bold:			#777,
+		fg-light:			#aaa,
+		border:				#f4f4f4,
+		border-bg:			#fafafa,
+		border2:			#e4e4e4,
+		border2-bg:			#f4f4f4,
+		border3:			#e0e0e0,
+		border3-bg:			#eaeaea,
+
+		accent1: (
+			bg:				#4acaa8,
+			fg-bold:		#ffffff,
+			fg:				mix(#4acaa8, #ffffff, 25%),
+			fg-light:		mix(#4acaa8, #ffffff, 40%)
+		),
+
+		accent2: (
+			bg:				#989898,
+			fg-bold:		#ffffff,
+			fg:				mix(#989898, #ffffff, 25%),
+			fg-light:		mix(#989898, #ffffff, 40%)
+		),
+
+		header: (
+			bg:				#4acaa8,
+			fg-bold:		#ffffff,
+			fg:				mix(#4acaa8, #ffffff, 25%),
+			fg-light:		mix(#4acaa8, #ffffff, 40%),
+			border:			mix(#4acaa8, #ffffff, 90%)
+		)
 	);
